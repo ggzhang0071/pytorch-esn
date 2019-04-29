@@ -5,7 +5,6 @@ def euclid_dist(x,y):
         final = np.sqrt(temp)
     return final
 
-#500 iterations for 30 particle
 import TorchESN as TN
 import numpy as np
 from numpy import random as rnd
@@ -54,7 +53,7 @@ for i in range(num_particles):
 
 #training 
 for i in range(max_iters):
-#     print(i)
+    print(i)
     # gravitational constant
     g = g0*np.exp((-alpha*i)/max_iters)
     # calculate mse
@@ -64,12 +63,8 @@ for i in range(max_iters):
     for p in particles:
         fitness = 0
         y_train = 0
-        set_trace()
-#         for t in trX:  #ith particle output compare with target , find fitness
-#         set_trace()
-#         print(p.params)
-        parameters=np.abs(rnd.randn(1,dim)).tolist()[0]
-        [fitness, out] = TN.torch_ESN(parameters)
+    
+        fitness = TN.torch_ESN(p.params)
 #         set_trace()
 #         fitness = fitness/X.shape[0]
         current_fitness[cf] = fitness
@@ -115,6 +110,5 @@ for i in range(max_iters):
     convergence[i] = gbest_score
     sys.stdout.write('\rPSOGSA is training ESN (Iteration = ' + str(i+1) + ', MSE = ' + str(gbest_score) + ')')
     sys.stdout.flush()
-#return convergence, p.params 
-
+return convergence, p.params 
 
