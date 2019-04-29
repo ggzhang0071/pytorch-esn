@@ -218,7 +218,7 @@ def Recurrent(inner, leaking_rate):
             # hack to handle LSTMS
             output.append(hidden[0] if isinstance(hidden, tuple) else hidden)
             if i%1000==0 or i==0:
-                torch.save(weight,'weight'+str(i)+'.pt')
+                torch.save(weight,'../Results/weights'+str(i)+'.pt')
              
 
         output = torch.cat(output, 0).view(input.size(0), *output[0].size())

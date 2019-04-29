@@ -109,7 +109,7 @@ class ESN(nn.Module):
         else:
             raise ValueError("Unknown readout training algorithm '{}'".format(
                 readout_training))
-
+#         set_trace()
         self.reservoir = Reservoir(mode, input_size, hidden_size, num_layers,
                                    leaking_rate, spectral_radius,
                                    self.w_ih_scale, density,
@@ -119,7 +119,11 @@ class ESN(nn.Module):
             self.readout = nn.Linear(input_size + hidden_size * num_layers,
                                      output_size)
         else:
+
             self.readout = nn.Linear(hidden_size * num_layers, output_size)
+            if torch.mean(self.readout.weight)==0:
+                set_trace()
+                self.readout.weight+=1e-6
         if readout_training == 'offline':
             self.readout.weight.requires_grad = False
 
@@ -133,6 +137,7 @@ class ESN(nn.Module):
         self.XTy = None
 
     def forward(self, input, washout, h_0=None, target=None):
+#         set_trace()
         with torch.no_grad():
             is_packed = isinstance(input, PackedSequence)
 #             set_trace()

@@ -6,15 +6,8 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "import TorchESN as TN"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "metadata": {},
-   "outputs": [],
-   "source": [
+    "import TorchESN as TN\n",
+    "\n",
     "import sys\n",
     "sys.path.append('../')\n",
     "import torch.nn\n",
