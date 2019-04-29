@@ -4,10 +4,11 @@ import torch.nn as nn
 from torch.nn import functional as F
 from torch.nn.utils.rnn import PackedSequence
 import torch.sparse
-
+from numpy.polynomial.hermite import hermval
+from ipdb import set_trace
 
 class Reservoir(nn.Module):
-
+#     set_trace()
     def __init__(self, mode, input_size, hidden_size, num_layers, leaking_rate,
                  spectral_radius, w_ih_scale,
                  density, bias=True, batch_first=False):
@@ -104,6 +105,7 @@ class Reservoir(nn.Module):
 
     def forward(self, input, hx=None):
         is_packed = isinstance(input, PackedSequence)
+#         set_trace()
         if is_packed:
             input, batch_sizes = input
             max_batch_size = int(batch_sizes[0])
@@ -162,7 +164,7 @@ class Reservoir(nn.Module):
                 self._all_weights += [weights]
             else:
                 self._all_weights += [weights[:2]]
-
+           
     @property
     def all_weights(self):
         return [[getattr(self, weight) for weight in weights] for weights in
@@ -179,6 +181,8 @@ def AutogradReservoir(mode, input_size, hidden_size, num_layers=1,
         cell = ResReLUCell
     elif mode == 'RES_ID':
         cell = ResIdCell
+    elif mode == 'RES_HermitePolys':
+        cell = ResHPCell
 
     if variable_length:
         layer = (VariableRecurrent(cell, leaking_rate),)
@@ -209,9 +213,13 @@ def Recurrent(inner, leaking_rate):
         output = []
         steps = range(input.size(0))
         for i in steps:
-            hidden = inner(input[i], hidden, leaking_rate, *weight)
-            # hack to handle LSTM
+#             set_trace()
+            [hidden, b_ih] = inner(input[i], hidden, leaking_rate, *weight)
+            # hack to handle LSTMS
             output.append(hidden[0] if isinstance(hidden, tuple) else hidden)
+            if i%1000==0 or i==0:
+                torch.save(weight,'weight'+str(i)+'.pt')
+             
 
         output = torch.cat(output, 0).view(input.size(0), *output[0].size())
 
@@ -262,7 +270,7 @@ def VariableRecurrent(inner, leaking_rate):
 def StackedRNN(inners, num_layers, lstm=False, train=True):
     num_directions = len(inners)
     total_layers = num_layers * num_directions
-
+#     set_trace()
     def forward(input, hidden, weight, batch_sizes):
         assert (len(weight) == total_layers)
         next_hidden = []
@@ -305,3 +313,12 @@ def ResIdCell(input, hidden, leaking_rate, w_ih, w_hh, b_ih=None):
     hy_ = F.linear(input, w_ih, b_ih) + F.linear(hidden, w_hh)
     hy = (1 - leaking_rate) * hidden + leaking_rate * hy_
     return hy
+
+def ResHPCell(input, hidden, leaking_rate, w_ih, w_hh, b_ih=None):
+#     coef=[0.005,0.004,0.003,0.002]
+    coef=[0.0045,0.004,0.0035,0.003]
+    hy_ = hermval((F.linear(input, w_ih, b_ih) + F.linear(hidden, w_hh)),coef,tensor=True)
+#     set_trace()
+#     hy_ =hermval(F.linear(input, w_ih, b_ih) + F.linear(hidden, w_hh),coef,tensor=True)
+    hy = (1 - leaking_rate) * hidden + leaking_rate * hy_
+    return hy, b_ih
