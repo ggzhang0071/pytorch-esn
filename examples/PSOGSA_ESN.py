@@ -1,24 +1,28 @@
-def euclid_dist(x,y):
-    temp = 0
-    for i,j in zip(x,y):
-        temp += (i-j)**2
-        final = np.sqrt(temp)
-    return final
-
 import TorchESN as TN
+import os
 import numpy as np
 from numpy import random as rnd
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import shuffle
 import sys
+import random
 import matplotlib.pyplot as plt
+import SaveDataCsv as SV
 from ipdb import set_trace
+
+np.seterr(divide='ignore', invalid='ignore')
 # %config InlineBackend.figure_format = 'retina'
-max_iters = 10
+def euclid_dist(x,y):
+    temp = 0   
+    for i,j in zip(x,y):
+        temp += (i-j)**2
+        final = np.sqrt(temp)
+    return final
+max_iters = 4
 c1 = 2
 c2 = 2
-num_particles = 5
+num_particles = 2
 g0 = 1
 hidden_nodes = 15  
 dim = 3
@@ -28,9 +32,8 @@ wMin=0.5
 current_fitness = np.zeros((num_particles,1))
 gbest = np.zeros((1,dim))
 gbest_score = float('inf')
-# input_nodes=1,
-# hidden_nodes=500
-# output_nodes=1
+OldBest=float('inf')
+
 convergence = np.zeros(max_iters)
 alpha = 20
 epsilon = 1
@@ -42,7 +45,7 @@ class Particle:
 particles = []
 for i in range(num_particles):
     p = Particle()
-    p.params = np.array([rnd.rand() for i in range(dim)])
+    p.params =np.array([random.random() for i in range(dim)])
     p.fitness = rnd.rand()
     p.velocity = 0.3*rnd.randn(dim)
     p.res_force = rnd.rand()
@@ -53,24 +56,22 @@ for i in range(num_particles):
 
 #training 
 for i in range(max_iters):
-    print(i)
     # gravitational constant
     g = g0*np.exp((-alpha*i)/max_iters)
     # calculate mse
-    cf = 0
-    parameters=np.abs(rnd.randn(1,dim)).tolist()[0]
-    
+    cf = 0    
     for p in particles:
         fitness = 0
         y_train = 0
-    
-        fitness = TN.torch_ESN(p.params)
 #         set_trace()
+        fitness = TN.torch_ESN(p.params)
 #         fitness = fitness/X.shape[0]
+        OldFitness=fitness
         current_fitness[cf] = fitness
         cf += 1
         
-        if gbest_score > fitness:
+        if gbest_score > fitness and OldBest>fitness:
+            OldBest=gbest_score
             gbest_score = fitness
             gbest = p.params
     
@@ -106,9 +107,12 @@ for i in range(max_iters):
     # position
     for p in particles:
         p.params = p.params + p.velocity
-    
     convergence[i] = gbest_score
-    sys.stdout.write('\rPSOGSA is training ESN (Iteration = ' + str(i+1) + ', MSE = ' + str(gbest_score) + ')')
+    sys.stdout.write('\rMPSOGSA is training ESN (Iteration = ' + str(i+1) + ', MSE = ' + str(gbest_score) + ')')
     sys.stdout.flush()
-return convergence, p.params 
-
+    # save results
+    Path='../Results/'
+    FileName='BestParameters.csv'
+    newdata=[max_iters,num_particles,p.params,convergence]
+    PathFileName=os.path.join(Path,FileName)
+    SV.SaveDataCsv(PathFileName,newdata)
