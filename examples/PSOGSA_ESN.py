@@ -13,12 +13,14 @@ from ipdb import set_trace
 
 np.seterr(divide='ignore', invalid='ignore')
 # %config InlineBackend.figure_format = 'retina'
+
 def euclid_dist(x,y):
     temp = 0   
     for i,j in zip(x,y):
         temp += (i-j)**2
         final = np.sqrt(temp)
     return final
+
 max_iters = 4
 c1 = 2
 c2 = 2
@@ -116,3 +118,4 @@ for i in range(max_iters):
     newdata=[max_iters,num_particles,p.params,convergence]
     PathFileName=os.path.join(Path,FileName)
     SV.SaveDataCsv(PathFileName,newdata)
+

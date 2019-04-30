@@ -32,21 +32,21 @@ def torch_ESN(parameters):
     output_size = 1
     hiddensize = abs(int(parameters[0]*600))
     numlayers=abs(int(parameters[1]*20))
-    w_ih_scale=abs(parameters[2])*0.1
+    w_ih_scale=abs(parameters[2])*1.2
       
     loss_fcn = torch.nn.MSELoss()
-
+     
     start = time.time()
 
         # Training
-#         set_trace()
     trY_flat = utils.prepare_target(trY.clone(), [trX.size(0)], washout)
 #         set_trace()
     model = ESN(input_size, hidden_size=hiddensize, output_size=output_size, num_layers=numlayers,w_ih_scale=w_ih_scale)
     model.to(device)
-#         set_trace()
+
     model(trX, washout, None, trY_flat)
     model.fit()
+#     set_trace()
     output, hidden = model(trX, washout)
     
 #         print("Training error:", loss_fcn(output, trY[washout[0]:]).item())
