@@ -6,4 +6,6 @@ cd $TOP/examples
 
 rm -fr *.log
 python3 PSOGSA_ESN.py 2>&1 |tee twitter_${cl}_$timestamp.log
+python3 ESNRegularizationCompare.py 2>&1 |tee twitter_${cl}_$timestamp.log
+
 
