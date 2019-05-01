@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plot_recurrence as plr
 import pandas as pd
 import DataLoad
-from ipdb import set_trace
+#from ipdb import set_trace
 def torch_ESN(parameters): 
     device = torch.device('cuda')
     dtype = torch.double
