@@ -10,7 +10,18 @@ import matplotlib.pyplot as plt
 import plot_recurrence as plr
 import pandas as pd
 import DataLoad
-#from ipdb import set_trace
+# from ipdb import set_trace
+
+def rec_plot(s, eps=0.001, steps=10):
+    if eps==None: eps=0.1
+    if steps==None: steps=10
+    N = s.size
+#     set_trace()
+    S = np.repeat(s[None,:], N, axis=0)
+    Z = np.floor(np.abs(S-S.T)/eps)
+    Z[Z>steps] = steps
+    return Z
+
 def torch_ESN(parameters): 
     device = torch.device('cuda')
     dtype = torch.double
@@ -30,9 +41,9 @@ def torch_ESN(parameters):
     washout = [500]
     input_size = trX.shape[2]
     output_size = 1
-    hiddensize = abs(int(parameters[0]*600))
-    numlayers=abs(int(parameters[1]*20))
-    w_ih_scale=abs(parameters[2])*1.2
+    hiddensize = abs(int((parameters[0]+0.6)*500))
+    numlayers=abs(int((parameters[1]+0.05)*20))
+    w_ih_scale=abs(parameters[2])*1
       
     loss_fcn = torch.nn.MSELoss()
      
@@ -54,17 +65,17 @@ def torch_ESN(parameters):
             # Test
 #         set_trace()
     output, hidden = model(tsX, [0], hidden)
-#         set_trace()
-    if loss_fcn(output, tsY).item()<1e-10:
-            output1=output.reshape(shape=(len(output.tolist()),)).tolist()
-            output1=np.array(output1)
-            set_trace()
-    #                 scaler = preprocessing.StandardScaler()
-    #                 output1 = scaler.fit_transform(output1)
-            rec = plr.rec_plot(output1)
-            plt.imshow(rec, cmap = plt.cm.gray)
-            plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'.png',dpi=600)
-            plt.show()
+    set_trace()
+    if loss_fcn(output, tsY).item()<1e-6:
+        output1=output.reshape(shape=(len(output.tolist()),)).tolist()
+        output1=np.array(output1)
+#             scaler = preprocessing.StandardScaler()
+#             output1 = scaler.fit_transform(output1)
+        output1=output1/np.mean(output1)
+        rec = rec_plot(output1)
+        plt.imshow(rec, cmap = plt.cm.gray)
+        plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'.png',dpi=600)
+        plt.show()
 
     print("Test error:", loss_fcn(output, tsY).item())
 #         print("Ended in", time.time() - start, "seconds.")

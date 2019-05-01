@@ -11,6 +11,7 @@ import plot_recurrence as plr
 import pandas as pd
 import DataLoad
 from ipdb import set_trace
+
 def torch_ESN(parameters): 
     device = torch.device('cuda')
     dtype = torch.double
@@ -26,13 +27,13 @@ def torch_ESN(parameters):
     trY = Y_data[:N1]
     tsX = X_data[N1:]
     tsY = Y_data[N1:]
-#     set_trace()s
+#     set_trace()
     washout = [500]
     input_size = trX.shape[2]
     output_size = 1
-    hiddensize = abs(int(parameters[0]*600))
-    numlayers=abs(int(parameters[1]*20))
-    w_ih_scale=abs(parameters[2])*1.2
+    hiddensize = abs(int((parameters[0]+0.02)*500))
+    numlayers=abs(int((parameters[1]+0.05)*20))
+    w_ih_scale=abs(parameters[2])*1
       
     loss_fcn = torch.nn.MSELoss()
     lr = 1e-4
@@ -49,27 +50,19 @@ def torch_ESN(parameters):
 #     set_trace()
     output, hidden = model(trX, washout)
     output, hidden = model(tsX, [0], hidden)
-    for t in range(100):
+    for t in range(100): 
         loss=loss_fcn(output, tsY)
         optimizer.zero_grad()
-#         reg_loss = None
-#         for param in model.parameters():
-#             if reg_loss is None:
-#                 reg_loss = 0.5 * torch.sum(param**2)
-#             else:
-#                 reg_loss = reg_loss + 0.5 * param.norm(2)**2
-
-#         loss += lmbd * reg_loss
         loss.backward(retain_graph=True )
 
-        optimizer.step()
-    #         print("Training error:", loss_fcn(output, trY[washout[0]:]).item())
+        optimizer.step()    
+#     print("Training error:", loss_fcn(output, trY[washout[0]:]).item())
                 # Test
 #         set_trace()
 #     for name, param in model.named_parameters():
 #         print(name, param)
 
-    if loss.item()<1e-10:
+    if loss.item()<1e-9:
             output1=output.reshape(shape=(len(output.tolist()),)).tolist()
             output1=np.array(output1)
             set_trace()
@@ -79,6 +72,5 @@ def torch_ESN(parameters):
             plt.imshow(rec, cmap = plt.cm.gray)
             plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'.png',dpi=600)
             plt.show()
-
-#     print("Test error:", loss.item())
+    print("Test error:", loss.item())
     return loss.item()
