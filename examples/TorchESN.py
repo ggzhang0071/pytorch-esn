@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plot_recurrence as plr
 import pandas as pd
 import DataLoad
-from ipdb import set_trace
+# from ipdb import set_trace
 
 def rec_plot(s, eps=0.001, steps=10):
     if eps==None: eps=0.1

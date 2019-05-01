@@ -5,7 +5,7 @@ from .reservoir import Reservoir
 from ..utils import washout_tensor
 import numpy as np
 import math
-from ipdb import set_trace
+#from ipdb import set_trace
 
 class ESN(nn.Module):
     """ Applies an Echo State Network to an input sequence. Multi-layer Echo

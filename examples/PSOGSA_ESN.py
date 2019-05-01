@@ -9,7 +9,7 @@ import sys
 import random
 import matplotlib.pyplot as plt
 import SaveDataCsv as SV
-from ipdb import set_trace
+#from ipdb import set_trace
 
 np.seterr(divide='ignore', invalid='ignore')
 # %config InlineBackend.figure_format = 'retina'
@@ -21,10 +21,10 @@ def euclid_dist(x,y):
         final = np.sqrt(temp)
     return final
 
-max_iters = 4
+max_iters = 50 
 c1 = 2
 c2 = 2
-num_particles = 2
+num_particles = 50
 g0 = 1
 hidden_nodes = 15  
 dim = 3
