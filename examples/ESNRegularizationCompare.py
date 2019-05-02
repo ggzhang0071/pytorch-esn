@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import TorchESNWithRegularation as TN
-from ipdb import set_trace
+#from ipdb import set_trace
 
 lamba=np.linspace(0,1,11)
 hiddensize =[0,0.01,0.03,0.05,0.07,0.1]
