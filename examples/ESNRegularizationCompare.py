@@ -5,14 +5,15 @@ import TorchESNWithRegularation as TN
 
 lamba=np.linspace(0,1,11)
 hiddensize =np.linspace(0,1,6)
-numLyers=np.linspace(0,1,11)
-lossH=[]
+numLyers=[0. , 0.2, 0.4, 0.6, 0.8, 1. ]
+
 for w in range(len(numLyers)):
+    lossH=[]
     for p in range(len(hiddensize)):
         lossH.append([])
         for k in range(len(lamba)):
             tmp=[]
-            for i in range(20):
+            for i in range(40):
                 tmp.append(TN.torch_ESN([hiddensize[p],numLyers[w],0.001,lamba[k]]))
             lossH[p].append(np.mean(np.array(tmp)))
 
