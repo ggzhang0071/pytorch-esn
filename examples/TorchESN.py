@@ -42,7 +42,7 @@ def torch_ESN(parameters):
     input_size = trX.shape[2]
     output_size = 1
     hiddensize = abs(int((parameters[0]+0.6)*500))
-    numlayers=abs(int((parameters[1]+0.05)*20))
+    numlayers=abs(int((parameters[1]+0.05)*10))
     w_ih_scale=abs(parameters[2])*1
       
     loss_fcn = torch.nn.MSELoss()
