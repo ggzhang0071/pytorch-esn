@@ -16,16 +16,16 @@ for w in range(len(numLyers)):
                 tmp.append(TN.torch_ESN([hiddensize[p],numLyers[w],0.001,lamba[k]]))
             lossH[p].append(np.mean(np.array(tmp)))
 
-    np.save('../Results/RegularizationChangesHiddensizewithNumlayers'+str(numLyers[w]),lossH)
-    fig = plt.gcf()
+    np.save('../Results/RegularizationChangesHiddensize'+str(numLyers[w]),lossH)
+    fig1 = plt.gcf()
     plt.subplot(111)
     plt.style.use('ggplot')
     leg=[]
     for i in range(len(hiddensize)):
         plt.plot(lossH[i], lw=2)
-    plt.xlabel('Regularization changes')
+    plt.xlabel('Regularization rate')
     plt.ylabel('Error')
     plt.draw()
     plt.legend(tuple(hiddensize))
-    fig.savefig('../Results/RegularizationChangesHiddensizewithNumlayers'+str(numLyers[w])+'.png',dpi=600)  
+    fig1.savefig('../Results/RegularizationChangesHiddensize'+str(numLyers[w])+'.png',dpi=600)  
     plt.show()

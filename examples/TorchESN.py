@@ -65,7 +65,7 @@ def torch_ESN(parameters):
             # Test
 #         set_trace()
     output, hidden = model(tsX, [0], hidden)
-    set_trace()
+    #set_trace()
     if loss_fcn(output, tsY).item()<1e-6:
         output1=output.reshape(shape=(len(output.tolist()),)).tolist()
         output1=np.array(output1)

@@ -24,7 +24,7 @@ def euclid_dist(x,y):
 max_iters = 50 
 c1 = 2
 c2 = 2
-num_particles = 50
+num_particles = 30
 g0 = 1
 hidden_nodes = 15  
 dim = 3
