@@ -66,6 +66,9 @@ for i in range(max_iters):
         fitness = 0
         y_train = 0
 #         set_trace()
+        hiddensize = abs(int((p.params[0]+0.3)*500))
+        numlayers=abs(int((p.params[1]+0.05)*10))
+        w_ih_scale=abs(p.params[2])*1
         fitness = TN.torch_ESN(p.params)
 #         fitness = fitness/X.shape[0]
         OldFitness=fitness
@@ -110,12 +113,12 @@ for i in range(max_iters):
     for p in particles:
         p.params = p.params + p.velocity
     convergence[i] = gbest_score
-    sys.stdout.write('\rMPSOGSA is training ESN (Iteration = ' + str(i+1) + ', MSE = ' + str(gbest_score) + ')')
-    sys.stdout.flush()
-    # save results
-    Path='../Results/'
-    FileName='BestParameters.csv'
-    newdata=[max_iters,num_particles,p.params,convergence]
-    PathFileName=os.path.join(Path,FileName)
-    SV.SaveDataCsv(PathFileName,newdata)
-
+    
+sys.stdout.write('\rMPSOGSA is training ESN (Iteration = ' + str(i+1) + ', MSE = ' + str(gbest_score) + ')')
+sys.stdout.flush()
+    # save results 
+Path='../Results/'
+FileName='BestParameters.csv'
+newdata=[max_iters,num_particles,[hiddensize,numlayers,w_ih_scale],convergence]
+PathFileName=os.path.join(Path,FileName)
+SV.SaveDataCsv(PathFileName,newdata)

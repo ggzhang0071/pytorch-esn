@@ -62,7 +62,7 @@ def torch_ESN(parameters):
 #     for name, param in model.named_parameters():
 #         print(name, param)
 
-    if loss.item()<1e-9:
+    if loss.item()<5e-10:
             output1=output.reshape(shape=(len(output.tolist()),)).tolist()
             output1=np.array(output1)
             #set_trace()

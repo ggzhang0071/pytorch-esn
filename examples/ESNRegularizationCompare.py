@@ -4,7 +4,7 @@ import TorchESNWithRegularation as TN
 # from ipdb import set_trace
 
 lamba=np.linspace(0,1,11)
-hiddensize =[0,0.01,0.03,0.05,0.07,0.09,0.1]
+hiddensize =np.linspace(0,1,6)
 numLyers=np.linspace(0,1,11)
 lossH=[]
 for w in range(len(numLyers)):
@@ -20,12 +20,11 @@ for w in range(len(numLyers)):
     fig1 = plt.gcf()
     plt.subplot(111)
     plt.style.use('ggplot')
-    leg=[]
     for i in range(len(hiddensize)):
         plt.plot(lossH[i], lw=2)
     plt.xlabel('Regularization rate')
     plt.ylabel('Error')
     plt.draw()
-    plt.legend(tuple(hiddensize))
+    plt.legend((10, 110, 210, 310, 410, 510))
     fig1.savefig('../Results/RegularizationChangesHiddensize'+str(numLyers[w])+'.png',dpi=600)  
     plt.show()

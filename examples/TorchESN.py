@@ -37,11 +37,11 @@ def torch_ESN(parameters):
     trY = Y_data[:N1]
     tsX = X_data[N1:]
     tsY = Y_data[N1:]
-#     set_trace()s
+#     set_trace()
     washout = [500]
     input_size = trX.shape[2]
     output_size = 1
-    hiddensize = abs(int((parameters[0]+0.6)*500))
+    hiddensize = abs(int((parameters[0]+0.5)*500))
     numlayers=abs(int((parameters[1]+0.05)*10))
     w_ih_scale=abs(parameters[2])*1
       
@@ -66,7 +66,7 @@ def torch_ESN(parameters):
 #         set_trace()
     output, hidden = model(tsX, [0], hidden)
     #set_trace()
-    if loss_fcn(output, tsY).item()<1e-6:
+    if loss_fcn(output, tsY).item()<1e-10:
         output1=output.reshape(shape=(len(output.tolist()),)).tolist()
         output1=np.array(output1)
 #             scaler = preprocessing.StandardScaler()
