@@ -41,9 +41,11 @@ def torch_ESN(parameters):
     washout = [500]
     input_size = trX.shape[2]
     output_size = 1
-    hiddensize = abs(int((parameters[0]+0.5)*500))
-    numlayers=abs(int((parameters[1]+0.05)*10))
-    w_ih_scale=abs(parameters[2])*1
+    hiddensize = abs(int(parameters[0]))
+    numlayers=abs(int(parameters[1]))
+    w_ih_scale=parameters[2]
+    lambda_reg=abs(parameters[3])
+    spectral_radius=abs(parameters[4])
       
     loss_fcn = torch.nn.MSELoss()
      
@@ -52,7 +54,7 @@ def torch_ESN(parameters):
         # Training
     trY_flat = utils.prepare_target(trY.clone(), [trX.size(0)], washout)
 #         set_trace()
-    model = ESN(input_size, hidden_size=hiddensize, output_size=output_size, num_layers=numlayers,w_ih_scale=w_ih_scale)
+    model = ESN(input_size, hidden_size=hiddensize, output_size=output_size,          num_layers=numlayers,w_ih_scale=w_ih_scale,lambda_reg=lambda_reg,spectral_radius=spectral_radius)
     model.to(device)
 
     model(trX, washout, None, trY_flat)

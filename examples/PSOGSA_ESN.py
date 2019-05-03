@@ -21,13 +21,13 @@ def euclid_dist(x,y):
         final = np.sqrt(temp)
     return final
 
-max_iters = 50 
+max_iters = 100
 c1 = 2
 c2 = 2
-num_particles = 30
+num_particles =60
 g0 = 1
 hidden_nodes = 15  
-dim = 3
+dim =5
 w=2;                 
 wMax=0.9            
 wMin=0.5              
@@ -47,7 +47,7 @@ class Particle:
 particles = []
 for i in range(num_particles):
     p = Particle()
-    p.params =np.array([random.random() for i in range(dim)])
+    p.params =np.array([np.random.randint(400,700), np.random.randint(1,10), np.random.uniform(-1,1), np.random.uniform(0,1),np.random.uniform(0,1)])
     p.fitness = rnd.rand()
     p.velocity = 0.3*rnd.randn(dim)
     p.res_force = rnd.rand()
@@ -65,10 +65,7 @@ for i in range(max_iters):
     for p in particles:
         fitness = 0
         y_train = 0
-#         set_trace()
-        hiddensize = abs(int((p.params[0]+0.3)*500))
-        numlayers=abs(int((p.params[1]+0.05)*10))
-        w_ih_scale=abs(p.params[2])*1
+        print(p.params)
         fitness = TN.torch_ESN(p.params)
 #         fitness = fitness/X.shape[0]
         OldFitness=fitness
@@ -119,6 +116,6 @@ sys.stdout.flush()
     # save results 
 Path='../Results/'
 FileName='BestParameters.csv'
-newdata=[max_iters,num_particles,[hiddensize,numlayers,w_ih_scale],convergence]
+newdata=[max_iters,num_particles,p.params,convergence]
 PathFileName=os.path.join(Path,FileName)
 SV.SaveDataCsv(PathFileName,newdata)
