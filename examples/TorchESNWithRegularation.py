@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plot_recurrence as plr
 import pandas as pd
 import DataLoad
-from ipdb import set_trace
+#from ipdb import set_trace
 
 def torch_ESN(parameters): 
     device = torch.device('cuda')
@@ -65,7 +65,7 @@ def torch_ESN(parameters):
     if loss.item()<1e-9:
             output1=output.reshape(shape=(len(output.tolist()),)).tolist()
             output1=np.array(output1)
-            set_trace()
+            #set_trace()
     #                 scaler = preprocessing.StandardScaler()
     #                 output1 = scaler.fit_transform(output1)
             rec = plr.rec_plot(output1)
