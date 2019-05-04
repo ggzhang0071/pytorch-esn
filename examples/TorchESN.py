@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plot_recurrence as plr
 import pandas as pd
 import DataLoad
-# from ipdb import set_trace
+from ipdb import set_trace
 
 def rec_plot(s, eps=0.001, steps=10):
     if eps==None: eps=0.1
@@ -44,8 +44,6 @@ def torch_ESN(parameters):
     hiddensize = abs(int(parameters[0]))
     numlayers=abs(int(parameters[1]))
     w_ih_scale=parameters[2]
-    lambda_reg=abs(parameters[3])
-    spectral_radius=abs(parameters[4])
       
     loss_fcn = torch.nn.MSELoss()
      
@@ -54,7 +52,7 @@ def torch_ESN(parameters):
         # Training
     trY_flat = utils.prepare_target(trY.clone(), [trX.size(0)], washout)
 #         set_trace()
-    model = ESN(input_size, hidden_size=hiddensize, output_size=output_size,          num_layers=numlayers,w_ih_scale=w_ih_scale,lambda_reg=lambda_reg,spectral_radius=spectral_radius)
+    model = ESN(input_size, hidden_size=hiddensize, output_size=output_size, num_layers=numlayers,w_ih_scale=w_ih_scale)
     model.to(device)
 
     model(trX, washout, None, trY_flat)
@@ -65,19 +63,17 @@ def torch_ESN(parameters):
 #         print("Training error:", loss_fcn(output, trY[washout[0]:]).item())
 
             # Test
-#         set_trace()
     output, hidden = model(tsX, [0], hidden)
-    #set_trace()
-    if loss_fcn(output, tsY).item()<1e-10:
-        output1=output.reshape(shape=(len(output.tolist()),)).tolist()
-        output1=np.array(output1)
-#             scaler = preprocessing.StandardScaler()
-#             output1 = scaler.fit_transform(output1)
-        output1=output1/np.mean(output1)
-        rec = rec_plot(output1)
-        plt.imshow(rec, cmap = plt.cm.gray)
-        plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'.png',dpi=600)
-        plt.show()
+    
+    if loss_fcn(output, tsY).item()<1e-2:
+        hiddenState=np.array(hidden.view(numlayers,hiddensize).tolist())
+        for i in range(numlayers):
+            plt.imshow(hiddenState)
+            hiddenState1=hiddenState[i]/np.mean(hiddenState[i])
+            rec = rec_plot(hiddenState1)
+            plt.imshow(rec, cmap = plt.cm.gray)
+            plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(i)+'_'+str(hiddensize)+'.png',dpi=600)
+            plt.show()
 
     print("Test error:", loss_fcn(output, tsY).item())
 #         print("Ended in", time.time() - start, "seconds.")

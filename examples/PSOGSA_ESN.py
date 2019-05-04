@@ -21,10 +21,10 @@ def euclid_dist(x,y):
         final = np.sqrt(temp)
     return final
 
-max_iters = 100
+max_iters = 50
 c1 = 2
 c2 = 2
-num_particles =60
+num_particles =30
 g0 = 1
 hidden_nodes = 15  
 dim =5
@@ -47,7 +47,7 @@ class Particle:
 particles = []
 for i in range(num_particles):
     p = Particle()
-    p.params =np.array([np.random.randint(400,700), np.random.randint(1,10), np.random.uniform(-1,1), np.random.uniform(0,1),np.random.uniform(0,1)])
+    p.params =np.array([np.random.randint(400,500), np.random.randint(1,10), np.random.uniform(-1,1)])
     p.fitness = rnd.rand()
     p.velocity = 0.3*rnd.randn(dim)
     p.res_force = rnd.rand()
