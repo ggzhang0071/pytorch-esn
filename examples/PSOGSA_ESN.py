@@ -22,10 +22,10 @@ def euclid_dist(x,y):
         final = np.sqrt(temp)
     return final
 
-max_iters = 5
+max_iters = 50
 c1 = 2
 c2 = 2
-num_particles =3
+num_particles =30
 g0 = 1
 hidden_nodes = 15  
 dim =3
@@ -132,7 +132,14 @@ for i in range(max_iters):
     for p in particles:
         p.params = p.params + p.velocity
     convergence[i] = gbest_score
-plt.plot(convergence)  
+    
+fig1 = plt.gcf()
+plt.subplot(111)    
+plt.plot(ConvergenceChanges)  
+plt.ylabel('Error')
+plt.draw()
+fig1.savefig('../Results/ConvergenceChanges.png',dpi=600)  
+    
 sys.stdout.write('\rMPSOGSA is training ESN (Iteration = ' + str(i+1) + ', MSE = ' + str(gbest_score) + ')')
 sys.stdout.flush()
     # save results 
