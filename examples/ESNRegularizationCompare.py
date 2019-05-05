@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import TorchESNWithRegularation as TN
+import TorchESNWithRegularation1 as TN
+# import TorchESNWithRegularation as TN
+
 # from ipdb import set_trace
 
 lamba=np.linspace(0,1,11)
