@@ -58,19 +58,5 @@ def torch_ESN(parameters):
         optimizer.step()    
 #     print("Training error:", loss_fcn(output, trY[washout[0]:]).item())
                 # Test
-#         set_trace()
-#     for name, param in model.named_parameters():
-#         print(name, param)
-
-    if loss.item()<5e-10:
-            output1=output.reshape(shape=(len(output.tolist()),)).tolist()
-            output1=np.array(output1)
-            #set_trace()
-    #                 scaler = preprocessing.StandardScaler()
-    #                 output1 = scaler.fit_transform(output1)
-            rec = plr.rec_plot(output1)
-            plt.imshow(rec, cmap = plt.cm.gray)
-            plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'.png',dpi=600)
-            plt.show()
     print("Test error:", loss.item())
     return loss.item()
