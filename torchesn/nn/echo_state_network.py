@@ -5,7 +5,7 @@ from .reservoir import Reservoir
 from ..utils import washout_tensor
 import numpy as np
 import math
-#from ipdb import set_trace
+# from ipdb import set_trace
 
 class ESN(nn.Module):
     """ Applies an Echo State Network to an input sequence. Multi-layer Echo
@@ -74,7 +74,7 @@ class ESN(nn.Module):
   
     def __init__(self, input_size, hidden_size, output_size, num_layers=6,
                  nonlinearity='HermitePolys', batch_first=False, leaking_rate=1,
-                 spectral_radius=0.9, w_ih_scale=1, lambda_reg=0, density=1,
+                 spectral_radius=1, w_ih_scale=1, lambda_reg=0, density=1,
                  w_io=False, readout_training='svd', output_steps='all'):
         super(ESN, self).__init__()
         self.input_size = input_size
@@ -119,11 +119,7 @@ class ESN(nn.Module):
             self.readout = nn.Linear(input_size + hidden_size * num_layers,
                                      output_size)
         else:
-#             set_trace()
             self.readout = nn.Linear(hidden_size * num_layers, output_size)
-            if torch.mean(self.readout.weight)==0:
-                
-                self.readout.weight+=1e-6
         if readout_training == 'offline':
             self.readout.weight.requires_grad = False
 
@@ -137,14 +133,10 @@ class ESN(nn.Module):
         self.XTy = None
 
     def forward(self, input, washout, h_0=None, target=None):
-#         set_trace()
         with torch.no_grad():
             is_packed = isinstance(input, PackedSequence)
-#             set_trace()
+
             output, hidden = self.reservoir(input, h_0)
-#             if output==0:
-#                 ouput=torch.mean(target)
-            
             if is_packed:
                 output, seq_lengths = pad_packed_sequence(output,
                                                           batch_first=self.batch_first)
@@ -218,13 +210,6 @@ class ESN(nn.Module):
 
                 elif self.readout_training == 'svd':
                     # Scikit-Learn SVD solver for ridge regression.
-#                     set_trace()
-                    if math.isnan(torch.mean(X).tolist()):
-                        tmp=X.tolist()
-                        X=np.random.randn(len(tmp),len(tmp[0]))
-                        device = torch.device('cuda')
-                        X=torch.from_numpy(X).to(device)
-                    
                     U, s, V = torch.svd(X)
                     idx = s > 1e-15  # same default value as scipy.linalg.pinv
                     s_nnz = s[idx][:, None]
@@ -279,3 +264,5 @@ class ESN(nn.Module):
     def reset_parameters(self):
         self.reservoir.reset_parameters()
         self.readout.reset_parameters()
+
+

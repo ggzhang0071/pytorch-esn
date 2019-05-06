@@ -33,9 +33,7 @@ def torch_ESN(parameters):
     hiddensize = abs(int(parameters[0]))
     numlayers=abs(int(parameters[1]))
     w_ih_scale=parameters[2]
-      
     loss_fcn = torch.nn.MSELoss()
-     
     start = time.time()
 
         # Training
@@ -51,26 +49,7 @@ def torch_ESN(parameters):
 #         print("Training error:", loss_fcn(output, trY[washout[0]:]).item())
 
             # Test
-    output, hidden = model(tsX, [0], hidden0)
-    
-#     if loss_fcn(output, tsY).item()<1e-9:
-#         hiddenState=np.array(hidden0.view(numlayers,hiddensize).tolist())
-#         rp = RecurrencePlot(dimension=7, time_delay=3,
-#                     threshold='percentage_points',
-#                     percentage=30)
-#         X_rp = rp.fit_transform(hiddenState)
-#         plt.figure(figsize=(6, 6))
-#         plt.imshow(X_rp[0], cmap='binary', origin='lower')
-# #         plt.title('Recurrence Plot', fontsize=14)
-#         plt.savefig('../Results/RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'_'+str(loss_fcn(output, tsY).item())+'.png',dpi=600)
-#         plt.show()
-#         weightsName='reservoir.weight_hh'
-#         for name, param in model.named_parameters():
-# #             print(name,param)
-#             if name.startswith(weightsName):
-# #                 set_trace()
-#                 torch.save(param,'../Results/weights'+str(loss_fcn(output, tsY).item())+'.pt')
-                
+    output, hidden = model(tsX, [0], hidden0)            
     print("Test error:", loss_fcn(output, tsY).item())
 
  
