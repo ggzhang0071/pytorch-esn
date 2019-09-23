@@ -1,3 +1,4 @@
+## MPSOGSA
 import TorchESN as TN
 import os
 import torch
@@ -9,20 +10,18 @@ from sklearn.utils import shuffle
 import sys
 from pyts.image import RecurrencePlot
 import matplotlib.pyplot as plt
+import argparse  
 import SaveDataCsv as SV
-from pdb import set_trace
 
-def PSOGSAESN(max_iters,num_particles,savepath):
+def euclid_dist(x,y):
+    temp = 0   
+    for i,j in zip(x,y):
+        temp += (i-j)**2
+        final = np.sqrt(temp)
+    return final
+def PSOGSAESN(dataset,max_iters,num_particles,savepath):
     np.seterr(divide='ignore', invalid='ignore')
     # %config InlineBackend.figure_format = 'retina'
-
-    def euclid_dist(x,y):
-        temp = 0   
-        for i,j in zip(x,y):
-            temp += (i-j)**2
-            final = np.sqrt(temp)
-        return final
-
     c1 = 2
     c2 = 2
     g0 = 1
@@ -66,7 +65,7 @@ def PSOGSAESN(max_iters,num_particles,savepath):
             fitness = 0
             y_train = 0
             print(p.params)
-            [fitness,hidden0,named_parameters] = TN.torch_ESN(p.params)
+            [fitness,hidden0,named_parameters] = TN.torch_ESN(dataset,p.params,args.savepath)
             hiddensize=int(p.params[0])
             numlayers=int(p.params[1])
     #         fitness = fitness/X.shape[0]
@@ -74,24 +73,21 @@ def PSOGSAESN(max_iters,num_particles,savepath):
             current_fitness[cf] = fitness
             cf += 1
             if gbest_score > fitness and OldBest>fitness:
-    #             set_trace()
-                hiddenState=np.array(hidden0.view(numlayers,hiddensize).tolist())
-                rp = RecurrencePlot(dimension=7, time_delay=3,
-                            threshold='percentage_points',
-                            percentage=30)
+                """hiddenState=np.array(hidden0.view(numlayers,hiddensize).tolist())
+                rp = RecurrencePlot()
                 X_rp = rp.fit_transform(hiddenState)
                 plt.figure(figsize=(6, 6))
                 plt.imshow(X_rp[0], cmap='binary', origin='lower')
         #         plt.title('Recurrence Plot', fontsize=14)
-                plt.savefig(savepath+'RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'_'+str(fitness)+'.png',dpi=600)
+                plt.savefig(savepath+'/RecurrencePlots/''RecurrencePlots'+str(numlayers)+'_'+str(hiddensize)+'_'+str(fitness)+'.png',dpi=600)
                 plt.show()
+                
                 weightsName='reservoir.weight_hh'
                 for name, param in named_parameters:
         #             print(name,param)
                     if name.startswith(weightsName):
         #                 set_trace()
-                        torch.save(param,savepath+'weights'+str(fitness)+'.pt')
-
+                        torch.save(param,savepath+'weights'+str(fitness)+'.pt') """
                 OldBest=gbest_score
                 gbest_score = fitness
                 gbest = p.params
@@ -145,3 +141,24 @@ def PSOGSAESN(max_iters,num_particles,savepath):
     newdata=[max_iters,num_particles,p.params,convergence]
     PathFileName=os.path.join(savepath,FileName)
     SV.SaveDataCsv(PathFileName,newdata)
+
+
+parser = argparse.ArgumentParser(description='PyTorch Time series forecasting')
+parser.add_argument('--dataset',default='Mackey_glass',
+                    help='dataset to train')
+
+parser.add_argument('--ngpu', type=int, default=1, help='0 = CPU.')
+
+parser.add_argument('--max_iters', type=int,default=50,
+                    help='')
+parser.add_argument('--num_particles', type=int, default=30,
+                    help='')
+parser.add_argument('--savepath', type=str,required=False, default='../Results/',
+                    help='Path to save results')
+
+args = parser.parse_args()
+
+if __name__ =="__main__":
+    args.use_cuda = args.ngpu>0 and torch.cuda.is_available()
+    PSOGSAESN(args.dataset,args.max_iters,args.num_particles,args.savepath)
+

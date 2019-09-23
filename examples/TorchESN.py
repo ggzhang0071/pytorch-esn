@@ -9,26 +9,24 @@ from sklearn import preprocessing
 # import matplotlib.pyplot as plt 
 import pandas as pd
 import DataLoad
-# from ipdb import set_trace
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import matplotlib._color_data as mcd
 
-def torch_ESN(parameters): 
+def torch_ESN(dataset,parameters,savepath): 
     device = torch.device('cuda')
     dtype = torch.double
     #HIData Mackey_glass
 #     set_trace()
-    [X_data,Y_data]=DataLoad.FilesLoad('Mackey_glass')
+    [X_data,Y_data]=DataLoad.FilesLoad(dataset)
+    X_train, X_test, y_train, y_test = train_test_split(X_data, Y_data, test_size=0.33, random_state=42)
     torch.set_default_dtype(dtype)
-    X_data = torch.from_numpy(X_data).to(device)
-    Y_data = torch.from_numpy(Y_data).to(device)
-    N1=5000
-#     set_trace()
-    trX = X_data[:N1]
-    trY = Y_data[:N1]
-    tsX = X_data[N1:]
-    tsY = Y_data[N1:]
-#     set_trace()
+    trX =torch.from_numpy(X_train).to(device)
+    trY = torch.from_numpy(y_train).to(device)
+    tsX =torch.from_numpy(X_test).to(device)
+    tsY = torch.from_numpy(y_test).to(device)
     washout = [500]
-    input_size = trX.shape[2]
+    input_size = trX.size(2)
     output_size = 1
     hiddensize = abs(int(parameters[0]))
     numlayers=abs(int(parameters[1]))
@@ -38,7 +36,6 @@ def torch_ESN(parameters):
 
         # Training
     trY_flat = utils.prepare_target(trY.clone(), [trX.size(0)], washout)
-#         set_trace()
     model = ESN(input_size, hidden_size=hiddensize, output_size=output_size, num_layers=numlayers,w_ih_scale=w_ih_scale)
     model.to(device)
 
@@ -52,18 +49,26 @@ def torch_ESN(parameters):
     output, hidden = model(tsX, [0], hidden0)            
     print("Test error:", loss_fcn(output, tsY).item())
 
- 
-   
-#         print("Ended in", time.time() - start, "seconds.")
-#         preds=[]
-#         testD=[]
+    print("Ended in", time.time() - start, "seconds.")
+    preds=[]
+    testD=[]
 #         画图
-#         for i in range(500):
-#             preds.append(output.tolist()[i][0])
-#             testD.append(tsY[i][0])
-#         plt.plot(preds, color='red')
-#         plt.plot(testD,'--' )
-#         plt.plot()
-#         plt.show()
+    loss=loss_fcn(output, tsY).item()
+    PlotLength=100
+    if loss<3e-4:
+        for i in range(tsY.size(0)):
+            preds.append(output.tolist()[i][0])
+            testD.append(tsY[i][0])
+        plt.style.use('ggplot')
+        x1=np.linspace(1,PlotLength,PlotLength)
+        x2=np.linspace(PlotLength+1,2*PlotLength,PlotLength) 
+        Y=torch.cat((trY[:PlotLength], tsY[:PlotLength]), 0).cpu().detach().numpy()[:,0,0]
+        plt.plot(Y,lw=1.5,color='orangered')
+        plt.plot(x1, output.cpu().detach().numpy()[:PlotLength][:,0][:,0],'--+',lw=1.5,color='magenta')
+        plt.plot(x2,preds[:PlotLength],'--+',lw=1.5,color='green')
+        plt.legend(('Original','Prediction (Training)','Prediction (Testing)'))
+        plt.savefig(savepath+'Prediction_results/'+dataset+'_Prediction_results'+str(round(loss,5))+'.png',dpi=600)
+    else:
+        pass
 
-    return loss_fcn(output, tsY).item(),hidden0,model.named_parameters()
+    return loss,hidden0,model.named_parameters()
